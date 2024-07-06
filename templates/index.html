@@ -25,9 +25,13 @@
                 <br><br>
             </div>
         </div>
-        
+
         <button type="button" onclick="addGrain()">Add Another Grain</button>
         <br><br>
+        
+        <label for="final_fermented_gravity">Final Fermented Gravity:</label>
+        <input type="number" id="final_fermented_gravity" name="final_fermented_gravity" value="1.000" step="0.001"><br><br>
+        
         <button type="submit">Calculate</button>
     </form>
 
@@ -41,6 +45,8 @@
     </ul>
     <p><strong>Max Specific Gravity:</strong> {{ max_specific_gravity }}</p>
     <p><strong>Typical Specific Gravity:</strong> {{ typical_specific_gravity }}</p>
+    <p><strong>Max Fermented ABV:</strong> {{ max_fermented_abv }}%</p>
+    <p><strong>Typical Fermented ABV:</strong> {{ typical_fermented_abv }}%</p>
     {% endif %}
     
     <script>

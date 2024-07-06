@@ -47,7 +47,8 @@ async def submit_form(
     water_gallons: float = Form(...),
     grain_types: List[str] = Form(...),
     pounds: List[float] = Form(...),
-    ounces: List[float] = Form(...)
+    ounces: List[float] = Form(...),
+    final_fermented_gravity: float = Form(default=1.000)
 ):
     grain_quantities = {
         grain_types[i]: pounds[i] + (ounces[i] / 16.0) for i in range(len(grain_types))
@@ -61,9 +62,15 @@ async def submit_form(
         (grain_ppg[grain]["Typical PPG"] * qty) / water_gallons for grain, qty in grain_quantities.items() if grain_ppg[grain]["Typical PPG"]
     ) / 1000 + 1
 
-    # Format specific gravity values to 3 significant digits
+    # Calculate fermented ABV values
+    max_fermented_abv = (max_specific_gravity - final_fermented_gravity) * 131.25
+    typical_fermented_abv = (typical_specific_gravity - final_fermented_gravity) * 131.25
+
+    # Format specific gravity and ABV values to 3 significant digits
     max_specific_gravity = f"{max_specific_gravity:.3f}"
     typical_specific_gravity = f"{typical_specific_gravity:.3f}"
+    max_fermented_abv = f"{max_fermented_abv:.2f}"
+    typical_fermented_abv = f"{typical_fermented_abv:.2f}"
 
     return templates.TemplateResponse(
         "index.html",
@@ -73,6 +80,8 @@ async def submit_form(
             "grain_quantities": grain_quantities,
             "max_specific_gravity": max_specific_gravity,
             "typical_specific_gravity": typical_specific_gravity,
+            "max_fermented_abv": max_fermented_abv,
+            "typical_fermented_abv": typical_fermented_abv,
             "grain_ppg": grain_ppg
         }
     )
