@@ -1,20 +1,54 @@
 body {
-    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
 }
 
-h1 {
-    color: #333;
+h1, h2 {
+    color: #343a40;
 }
 
-label {
+.container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-small {
+    max-width: 150px;
+}
+
+.input-smaller {
+    max-width: 100px; /* Increased width to 100px for 25% wider input boxes */
     display: inline-block;
-    width: 100px;
+    width: auto;
 }
 
-input, select {
-    margin-bottom: 10px;
+.form-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
-button {
+.form-group label {
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.grain-entry .form-group {
+    display: flex;
+    align-items: center;
+}
+
+.grain-entry .form-group .col-md-4 {
+    display: flex;
+    align-items: center;
+    padding-right: 0; /* Remove right padding to reduce spacing */
+}
+
+.grain-entry .form-group .col-md-4 label {
+    margin-right: 5px;
+}
+
+.btn {
     margin-top: 10px;
 }
