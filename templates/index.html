@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mash Specific Gravity Calculator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Mash Specific Gravity Calculator</h1>
+    <form method="post" action="/submit">
+        <label for="water_gallons">Water (gallons):</label>
+        <input type="number" id="water_gallons" name="water_gallons" step="0.01" required><br><br>
+        
+        <div id="grains">
+            <div class="grain-entry">
+                <label for="grain_type_0">Grain Type:</label>
+                <select id="grain_type_0" name="grain_types">
+                    {% for grain, ppg in grain_ppg.items() %}
+                    <option value="{{ grain }}">{{ grain }}</option>
+                    {% endfor %}
+                </select>
+                <label for="pounds_0">Pounds:</label>
+                <input type="number" id="pounds_0" name="pounds" step="0.01" required>
+                <label for="ounces_0">Ounces:</label>
+                <input type="number" id="ounces_0" name="ounces" step="0.01" required>
+                <br><br>
+            </div>
+        </div>
+        
+        <button type="button" onclick="addGrain()">Add Another Grain</button>
+        <br><br>
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if water_gallons %}
+    <h2>Results</h2>
+    <p>Water: {{ water_gallons }} gallons</p>
+    <ul>
+        {% for grain, quantity in grain_quantities.items() %}
+        <li>{{ grain }}: {{ quantity }} lbs</li>
+        {% endfor %}
+    </ul>
+    <p><strong>Max Specific Gravity:</strong> {{ max_specific_gravity }}</p>
+    <p><strong>Typical Specific Gravity:</strong> {{ typical_specific_gravity }}</p>
+    {% endif %}
+    
+    <script>
+        let grainCount = 1;
+        function addGrain() {
+            const grainDiv = document.createElement('div');
+            grainDiv.classList.add('grain-entry');
+            grainDiv.innerHTML = `
+                <label for="grain_type_${grainCount}">Grain Type:</label>
+                <select id="grain_type_${grainCount}" name="grain_types">
+                    {% for grain, ppg in grain_ppg.items() %}
+                    <option value="{{ grain }}">{{ grain }}</option>
+                    {% endfor %}
+                </select>
+                <label for="pounds_${grainCount}">Pounds:</label>
+                <input type="number" id="pounds_${grainCount}" name="pounds" step="0.01" required>
+                <label for="ounces_${grainCount}">Ounces:</label>
+                <input type="number" id="ounces_${grainCount}" name="ounces" step="0.01" required>
+                <br><br>`;
+            document.getElementById('grains').appendChild(grainDiv);
+            grainCount++;
+        }
+    </script>
+</body>
+</html>
