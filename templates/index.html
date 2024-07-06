@@ -19,9 +19,9 @@
                     {% endfor %}
                 </select>
                 <label for="pounds_0">Pounds:</label>
-                <input type="number" id="pounds_0" name="pounds" step="0.01" required>
+                <input type="number" id="pounds_0" name="pounds" step="0.01" value="0">
                 <label for="ounces_0">Ounces:</label>
-                <input type="number" id="ounces_0" name="ounces" step="0.01" required>
+                <input type="number" id="ounces_0" name="ounces" step="0.01" value="0">
                 <br><br>
             </div>
         </div>
@@ -62,9 +62,9 @@
                     {% endfor %}
                 </select>
                 <label for="pounds_${grainCount}">Pounds:</label>
-                <input type="number" id="pounds_${grainCount}" name="pounds" step="0.01" required>
+                <input type="number" id="pounds_${grainCount}" name="pounds" step="0.01" value="0">
                 <label for="ounces_${grainCount}">Ounces:</label>
-                <input type="number" id="ounces_${grainCount}" name="ounces" step="0.01" required>
+                <input type="number" id="ounces_${grainCount}" name="ounces" step="0.01" value="0">
                 <br><br>`;
             document.getElementById('grains').appendChild(grainDiv);
             grainCount++;
