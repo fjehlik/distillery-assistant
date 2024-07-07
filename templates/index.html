@@ -50,7 +50,7 @@
         <p>Water: {{ water_gallons }} gallons</p>
         <ul>
             {% for grain, quantity in grain_quantities.items() %}
-            <li>{{ grain }}: {{ quantity }} lbs</li>
+            <li>{{ grain }}: {{ quantity }} lbs (Gelatinization Temp: {{ grain_gelatinization_temps[grain] }} °F)</li>
             {% endfor %}
         </ul>
         <p><strong>Max Specific Gravity:</strong> {{ max_specific_gravity }}</p>

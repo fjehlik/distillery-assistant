@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List
 import uvicorn
-from grain_ppg import grain_ppg  # Import the dictionary
+from grain_ppg import grain_ppg 
 from grain_gelatinization_table import grain_gelatinization_dict
 
 app = FastAPI()
@@ -46,6 +46,11 @@ async def submit_form(
     max_fermented_abv = f"{max_fermented_abv:.2f}"
     typical_fermented_abv = f"{typical_fermented_abv:.2f}"
 
+    grain_gelatinization_temps = {
+        grain: grain_gelatinization_dict.get(grain, {"Fahrenheit": "N/A"})["Fahrenheit"]
+        for grain in grain_types
+    }
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -56,7 +61,8 @@ async def submit_form(
             "typical_specific_gravity": typical_specific_gravity,
             "max_fermented_abv": max_fermented_abv,
             "typical_fermented_abv": typical_fermented_abv,
-            "grain_ppg": grain_ppg
+            "grain_ppg": grain_ppg,
+            "grain_gelatinization_temps": grain_gelatinization_temps
         }
     )
 
