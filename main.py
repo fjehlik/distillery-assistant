@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def get_form(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "grain_ppg": grain_ppg})
+    return templates.TemplateResponse("index.html", {"request": request, "grain_ppg": grain_ppg, "final_fermented_gravity": "1.000"})
 
 @app.post("/submit", response_class=HTMLResponse)
 async def submit_form(
@@ -24,7 +24,7 @@ async def submit_form(
     grain_types: List[str] = Form(...),
     pounds: List[float] = Form(...),
     ounces: List[float] = Form(...),
-    final_fermented_gravity: float = Form(default=1.000)
+    final_fermented_gravity: float = Form(...),
 ):
     grain_quantities = {
         grain_types[i]: pounds[i] + (ounces[i] / 16.0) for i in range(len(grain_types))
@@ -45,6 +45,7 @@ async def submit_form(
     typical_specific_gravity = f"{typical_specific_gravity:.3f}"
     max_fermented_abv = f"{max_fermented_abv:.2f}"
     typical_fermented_abv = f"{typical_fermented_abv:.2f}"
+    final_fermented_gravity = f"{final_fermented_gravity:.3f}"
 
     grain_gelatinization_temps = {
         grain: grain_gelatinization_dict.get(grain, {"Fahrenheit": "N/A"})["Fahrenheit"]
