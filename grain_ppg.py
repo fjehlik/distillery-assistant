@@ -1,5 +1,3 @@
-# grain_ppg.py
-
 grain_ppg = {
     "2 Row Barley": {"Max PPG": 37, "Typical PPG": 31},
     "6 Row Barley": {"Max PPG": 35, "Typical PPG": 30},
@@ -25,5 +23,15 @@ grain_ppg = {
     "Wheat (Flaked)": {"Max PPG": 36, "Typical PPG": 30},
     "Rice (Flaked)": {"Max PPG": 38, "Typical PPG": 32},
     "Malto-Dextrin Powder": {"Max PPG": 40, "Typical PPG": 40},
-    "Sugar (Corn, Cane)": {"Max PPG": 46, "Typical PPG": 46}
+    "Sugar (Corn, Cane)": {"Max PPG": 46, "Typical PPG": 46},
+    "Apples": {"Max PPG": 29, "Typical PPG": 26},
+    "Pears": {"Max PPG": 28, "Typical PPG": 25},
+    "Peaches": {"Max PPG": 30, "Typical PPG": 27},
+    "Cherries": {"Max PPG": 29, "Typical PPG": 26},
+    "Plums": {"Max PPG": 28, "Typical PPG": 25},
+    "Grapes": {"Max PPG": 30, "Typical PPG": 27},
+    "Raspberries": {"Max PPG": 27, "Typical PPG": 24},
+    "Blackberries": {"Max PPG": 28, "Typical PPG": 25},
+    "Blueberries": {"Max PPG": 27, "Typical PPG": 24},
+    "Strawberries": {"Max PPG": 26, "Typical PPG": 23}
 }
