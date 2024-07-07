@@ -8,41 +8,65 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Mash Specific Gravity Calculator</h1>
-        <form method="post" action="/submit" class="mt-4">
+        <form method="post" action="/submit" class="mt-4" id="mash-form">
             <div class="form-group">
                 <label for="water_gallons">Water (gallons):</label>
-                <input type="number" id="water_gallons" name="water_gallons" class="form-control input-smaller" step="0.01" required>
+                <input type="number" id="water_gallons" name="water_gallons" class="form-control input-smaller" step="0.01" required value="{{ water_gallons if submitted else '' }}">
             </div>
             
             <div id="grains">
-                <div class="grain-entry form-group row">
-                    <div class="col-md-4">
-                        <label for="grain_type_0">Grain Type:</label>
-                        <select id="grain_type_0" name="grain_types" class="form-control">
-                            {% for grain, ppg in grain_ppg.items() %}
-                            <option value="{{ grain }}">{{ grain }}</option>
-                            {% endfor %}
-                        </select>
+                {% if submitted %}
+                    {% for i in range(grain_types|length) %}
+                        <div class="grain-entry form-group row">
+                            <div class="col-md-4">
+                                <label for="grain_type_{{ i }}">Grain Type:</label>
+                                <select id="grain_type_{{ i }}" name="grain_types" class="form-control">
+                                    {% for grain, ppg in grain_ppg.items() %}
+                                    <option value="{{ grain }}" {% if grain_types[i] == grain %}selected{% endif %}>{{ grain }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="pounds_{{ i }}">Pounds:</label>
+                                <input type="number" id="pounds_{{ i }}" name="pounds" class="form-control input-small" step="0.01" value="{{ pounds[i] }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="ounces_{{ i }}">Ounces:</label>
+                                <input type="number" id="ounces_{{ i }}" name="ounces" class="form-control input-small" step="0.01" value="{{ ounces[i] }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="grain-entry form-group row">
+                        <div class="col-md-4">
+                            <label for="grain_type_0">Grain Type:</label>
+                            <select id="grain_type_0" name="grain_types" class="form-control">
+                                {% for grain, ppg in grain_ppg.items() %}
+                                <option value="{{ grain }}">{{ grain }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="pounds_0">Pounds:</label>
+                            <input type="number" id="pounds_0" name="pounds" class="form-control input-small" step="0.01" value="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ounces_0">Ounces:</label>
+                            <input type="number" id="ounces_0" name="ounces" class="form-control input-small" step="0.01" value="0">
+                        </div>
                     </div>
-                    <div class="col-md-2"> <!-- Adjusted column width -->
-                        <label for="pounds_0">Pounds:</label>
-                        <input type="number" id="pounds_0" name="pounds" class="form-control input-small" step="0.01" value="0">
-                    </div>
-                    <div class="col-md-2"> <!-- Adjusted column width -->
-                        <label for="ounces_0">Ounces:</label>
-                        <input type="number" id="ounces_0" name="ounces" class="form-control input-small" step="0.01" value="0">
-                    </div>
-                </div>
+                {% endif %}
             </div>
 
             <button type="button" class="btn btn-secondary mb-3" onclick="addGrain()">Add Another Grain</button>
             
             <div class="form-group">
                 <label for="final_fermented_gravity">Final Fermented Gravity:</label>
-                <input type="number" id="final_fermented_gravity" name="final_fermented_gravity" class="form-control input-smaller" value="1.000" step="0.001">
+                <input type="number" id="final_fermented_gravity" name="final_fermented_gravity" class="form-control input-smaller" value="{{ final_fermented_gravity if submitted else '1.000' }}" step="0.001">
             </div>
             
             <button type="submit" class="btn btn-primary">Calculate</button>
+            <button type="button" class="btn btn-warning" onclick="resetForm()">Reset</button>
         </form>
 
         {% if water_gallons %}
@@ -64,7 +88,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        let grainCount = 1;
+        let grainCount = {{ grain_types|length if submitted else 1 }};
+        
         function addGrain() {
             const grainDiv = document.createElement('div');
             grainDiv.classList.add('grain-entry', 'form-group', 'row');
@@ -77,17 +102,42 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2"> <!-- Adjusted column width -->
+                <div class="col-md-2">
                     <label for="pounds_${grainCount}">Pounds:</label>
                     <input type="number" id="pounds_${grainCount}" name="pounds" class="form-control input-small" step="0.01" value="0">
                 </div>
-                <div class="col-md-2"> <!-- Adjusted column width -->
+                <div class="col-md-2">
                     <label for="ounces_${grainCount}">Ounces:</label>
                     <input type="number" id="ounces_${grainCount}" name="ounces" class="form-control input-small" step="0.01" value="0">
                 </div>
             `;
             document.getElementById('grains').appendChild(grainDiv);
             grainCount++;
+        }
+
+        function resetForm() {
+            document.getElementById('mash-form').reset();
+            document.getElementById('grains').innerHTML = `
+                <div class="grain-entry form-group row">
+                    <div class="col-md-4">
+                        <label for="grain_type_0">Grain Type:</label>
+                        <select id="grain_type_0" name="grain_types" class="form-control">
+                            {% for grain, ppg in grain_ppg.items() %}
+                            <option value="{{ grain }}">{{ grain }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="pounds_0">Pounds:</label>
+                        <input type="number" id="pounds_0" name="pounds" class="form-control input-small" step="0.01" value="0">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ounces_0">Ounces:</label>
+                        <input type="number" id="ounces_0" name="ounces" class="form-control input-small" step="0.01" value="0">
+                    </div>
+                </div>
+            `;
+            grainCount = 1;
         }
     </script>
 </body>
