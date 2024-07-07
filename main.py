@@ -4,44 +4,29 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List
 import uvicorn
+from grain_ppg import grain_ppg
+from grain_gelatinization_table import grain_gelatinization_dict
 
+# Initialize the FastAPI app
 app = FastAPI()
 
+# Mount the static files directory for serving static content
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Set up Jinja2 templates directory
 templates = Jinja2Templates(directory="templates")
-
-# Dictionary mapping grain types to their Max PPG and Typical PPG values
-grain_ppg = {
-    "2 Row Barley": {"Max PPG": 37, "Typical PPG": 31},
-    "6 Row Barley": {"Max PPG": 35, "Typical PPG": 30},
-    "Biscuit/Victory Malt": {"Max PPG": 35, "Typical PPG": 30},
-    "Vienna Malt": {"Max PPG": 35, "Typical PPG": 30},
-    "Munich Malt": {"Max PPG": 35, "Typical PPG": 30},
-    "Brown Malt": {"Max PPG": 32, "Typical PPG": 28},
-    "Dextrin Malt": {"Max PPG": 32, "Typical PPG": 28},
-    "Light Crystal (10 - 15L)": {"Max PPG": 35, "Typical PPG": 30},
-    "Pale Crystal (25 - 40L)": {"Max PPG": 34, "Typical PPG": 29},
-    "Medium Crystal (60 - 75L)": {"Max PPG": 34, "Typical PPG": 29},
-    "Dark Crystal (120L)": {"Max PPG": 33, "Typical PPG": 28},
-    "Special B": {"Max PPG": 31, "Typical PPG": 27},
-    "Chocolate Malt": {"Max PPG": 28, "Typical PPG": 24},
-    "Roast Barley": {"Max PPG": 25, "Typical PPG": 22},
-    "Black Patent Malt": {"Max PPG": 25, "Typical PPG": 22},
-    "Wheat Malt": {"Max PPG": 37, "Typical PPG": 31},
-    "Rye Malt": {"Max PPG": 29, "Typical PPG": 25},
-    "Cracked Corn": {"Max PPG": 30, "Typical PPG": None},
-    "Oatmeal (Flaked)": {"Max PPG": 32, "Typical PPG": 28},
-    "Corn (Flaked)": {"Max PPG": 39, "Typical PPG": 33},
-    "Barley (Flaked)": {"Max PPG": 32, "Typical PPG": 28},
-    "Wheat (Flaked)": {"Max PPG": 36, "Typical PPG": 30},
-    "Rice (Flaked)": {"Max PPG": 38, "Typical PPG": 32},
-    "Malto-Dextrin Powder": {"Max PPG": 40, "Typical PPG": 40},
-    "Sugar (Corn, Cane)": {"Max PPG": 46, "Typical PPG": 46}
-}
 
 @app.get("/", response_class=HTMLResponse)
 async def get_form(request: Request):
+    """
+    Display the form for entering mash details.
+
+    Args:
+        request (Request): The request object containing the details of the HTTP request.
+
+    Returns:
+        HTMLResponse: The rendered HTML form for the user to input mash details.
+    """
     return templates.TemplateResponse("index.html", {"request": request, "grain_ppg": grain_ppg})
 
 @app.post("/submit", response_class=HTMLResponse)
@@ -53,26 +38,54 @@ async def submit_form(
     ounces: List[float] = Form(...),
     final_fermented_gravity: float = Form(default=1.000)
 ):
+    """
+    Handle form submission, perform specific gravity and ABV calculations, and display the results.
+
+    Args:
+        request (Request): The request object containing the details of the HTTP request.
+        water_gallons (float): The total volume of water used in gallons.
+        grain_types (List[str]): List of selected grain types.
+        pounds (List[float]): List of quantities of grains in pounds.
+        ounces (List[float]): List of quantities of grains in ounces.
+        final_fermented_gravity (float): The final specific gravity after fermentation.
+
+    Returns:
+        HTMLResponse: The rendered HTML response displaying the calculation results.
+    """
+    # Convert grain quantities to pounds
     grain_quantities = {
         grain_types[i]: pounds[i] + (ounces[i] / 16.0) for i in range(len(grain_types))
     }
 
+    # Calculate maximum specific gravity
     max_specific_gravity = sum(
         (grain_ppg[grain]["Max PPG"] * qty) / water_gallons for grain, qty in grain_quantities.items() if grain_ppg[grain]["Max PPG"]
     ) / 1000 + 1
 
+    # Calculate typical specific gravity
     typical_specific_gravity = sum(
         (grain_ppg[grain]["Typical PPG"] * qty) / water_gallons for grain, qty in grain_quantities.items() if grain_ppg[grain]["Typical PPG"]
     ) / 1000 + 1
 
+    # Calculate maximum fermented alcohol by volume (ABV)
     max_fermented_abv = (max_specific_gravity - final_fermented_gravity) * 131.25
+
+    # Calculate typical fermented alcohol by volume (ABV)
     typical_fermented_abv = (typical_specific_gravity - final_fermented_gravity) * 131.25
 
+    # Format the results to three decimal places for specific gravity and two decimal places for ABV
     max_specific_gravity = f"{max_specific_gravity:.3f}"
     typical_specific_gravity = f"{typical_specific_gravity:.3f}"
     max_fermented_abv = f"{max_fermented_abv:.2f}"
     typical_fermented_abv = f"{typical_fermented_abv:.2f}"
 
+    # Get gelatinization temperatures for the selected grains
+    grain_gelatinization_temps = {
+        grain: grain_gelatinization_dict.get(grain, {"Fahrenheit": "N/A"})["Fahrenheit"]
+        for grain in grain_types
+    }
+
+    # Render the response template with the calculated results
     return templates.TemplateResponse(
         "index.html",
         {
@@ -83,13 +96,21 @@ async def submit_form(
             "typical_specific_gravity": typical_specific_gravity,
             "max_fermented_abv": max_fermented_abv,
             "typical_fermented_abv": typical_fermented_abv,
-            "grain_ppg": grain_ppg
+            "grain_ppg": grain_ppg,
+            "grain_gelatinization_temps": grain_gelatinization_temps
         }
     )
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
+    """
+    Serve the favicon for the application.
+
+    Returns:
+        FileResponse: The response object for serving the favicon.
+    """
     return FileResponse("static/favicon.ico")
 
+# Run the FastAPI application
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
