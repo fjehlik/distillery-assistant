@@ -8,7 +8,7 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Mash Specific Gravity Calculator</h1>
-        <form method="post" action="/submit" class="mt-4" id="mash-form">
+        <form method="post" action="/submit" class="mt-4" id="mash-form" data-grain-count="{{ grain_types|length if submitted else 1 }}">
             <div class="form-group">
                 <label for="water_gallons">Water (gallons):</label>
                 <input type="number" id="water_gallons" name="water_gallons" class="form-control input-smaller" step="0.01" required value="{{ water_gallons if submitted else '' }}">
@@ -88,57 +88,59 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        let grainCount = {{ grain_types|length if submitted else 1 }};
-        
-        function addGrain() {
-            const grainDiv = document.createElement('div');
-            grainDiv.classList.add('grain-entry', 'form-group', 'row');
-            grainDiv.innerHTML = `
-                <div class="col-md-4">
-                    <label for="grain_type_${grainCount}">Grain Type:</label>
-                    <select id="grain_type_${grainCount}" name="grain_types" class="form-control">
-                        {% for grain, ppg in grain_ppg.items() %}
-                        <option value="{{ grain }}">{{ grain }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="pounds_${grainCount}">Pounds:</label>
-                    <input type="number" id="pounds_${grainCount}" name="pounds" class="form-control input-small" step="0.01" value="0">
-                </div>
-                <div class="col-md-2">
-                    <label for="ounces_${grainCount}">Ounces:</label>
-                    <input type="number" id="ounces_${grainCount}" name="ounces" class="form-control input-small" step="0.01" value="0">
-                </div>
-            `;
-            document.getElementById('grains').appendChild(grainDiv);
-            grainCount++;
-        }
-
-        function resetForm() {
-            document.getElementById('mash-form').reset();
-            document.getElementById('grains').innerHTML = `
-                <div class="grain-entry form-group row">
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let grainCount = parseInt(document.getElementById('mash-form').getAttribute('data-grain-count'));
+            
+            window.addGrain = function() {
+                const grainDiv = document.createElement('div');
+                grainDiv.classList.add('grain-entry', 'form-group', 'row');
+                grainDiv.innerHTML = `
                     <div class="col-md-4">
-                        <label for="grain_type_0">Grain Type:</label>
-                        <select id="grain_type_0" name="grain_types" class="form-control">
+                        <label for="grain_type_${grainCount}">Grain Type:</label>
+                        <select id="grain_type_${grainCount}" name="grain_types" class="form-control">
                             {% for grain, ppg in grain_ppg.items() %}
                             <option value="{{ grain }}">{{ grain }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label for="pounds_0">Pounds:</label>
-                        <input type="number" id="pounds_0" name="pounds" class="form-control input-small" step="0.01" value="0">
+                        <label for="pounds_${grainCount}">Pounds:</label>
+                        <input type="number" id="pounds_${grainCount}" name="pounds" class="form-control input-small" step="0.01" value="0">
                     </div>
                     <div class="col-md-2">
-                        <label for="ounces_0">Ounces:</label>
-                        <input type="number" id="ounces_0" name="ounces" class="form-control input-small" step="0.01" value="0">
+                        <label for="ounces_${grainCount}">Ounces:</label>
+                        <input type="number" id="ounces_${grainCount}" name="ounces" class="form-control input-small" step="0.01" value="0">
                     </div>
-                </div>
-            `;
-            grainCount = 1;
-        }
+                `;
+                document.getElementById('grains').appendChild(grainDiv);
+                grainCount++;
+            }
+
+            window.resetForm = function() {
+                document.getElementById('mash-form').reset();
+                document.getElementById('grains').innerHTML = `
+                    <div class="grain-entry form-group row">
+                        <div class="col-md-4">
+                            <label for="grain_type_0">Grain Type:</label>
+                            <select id="grain_type_0" name="grain_types" class="form-control">
+                                {% for grain, ppg in grain_ppg.items() %}
+                                <option value="{{ grain }}">{{ grain }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="pounds_0">Pounds:</label>
+                            <input type="number" id="pounds_0" name="pounds" class="form-control input-small" step="0.01" value="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ounces_0">Ounces:</label>
+                            <input type="number" id="ounces_0" name="ounces" class="form-control input-small" step="0.01" value="0">
+                        </div>
+                    </div>
+                `;
+                grainCount = 1;
+            }
+        });
     </script>
 </body>
 </html>
