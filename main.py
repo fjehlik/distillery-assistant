@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List
@@ -65,11 +65,9 @@ async def submit_form(
         (grain_ppg[grain]["Typical PPG"] * qty) / water_gallons for grain, qty in grain_quantities.items() if grain_ppg[grain]["Typical PPG"]
     ) / 1000 + 1
 
-    # Calculate fermented ABV values
     max_fermented_abv = (max_specific_gravity - final_fermented_gravity) * 131.25
     typical_fermented_abv = (typical_specific_gravity - final_fermented_gravity) * 131.25
 
-    # Format specific gravity and ABV values to 3 significant digits
     max_specific_gravity = f"{max_specific_gravity:.3f}"
     typical_specific_gravity = f"{typical_specific_gravity:.3f}"
     max_fermented_abv = f"{max_fermented_abv:.2f}"
@@ -88,6 +86,10 @@ async def submit_form(
             "grain_ppg": grain_ppg
         }
     )
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/favicon.ico")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
