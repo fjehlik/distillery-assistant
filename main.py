@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from typing import List
 import uvicorn
 from grain_ppg import grain_ppg  # Import the dictionary
+from grain_gelatinization_table import grain_gelatinization_dict
 
 app = FastAPI()
 
