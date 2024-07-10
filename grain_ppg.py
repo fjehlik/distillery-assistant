@@ -3,6 +3,7 @@ grain_ppg = {
     "6 Row Barley": {"Max PPG": 35, "Typical PPG": 30},
     "Apples": {"Max PPG": 29, "Typical PPG": 26},
     "Barley (Flaked)": {"Max PPG": 32, "Typical PPG": 28},
+    "Bananas": {"Max PPG": 28, "Typical PPG": 25},
     "Biscuit/Victory Malt": {"Max PPG": 35, "Typical PPG": 30},
     "Black Patent Malt": {"Max PPG": 25, "Typical PPG": 22},
     "Blackberries": {"Max PPG": 28, "Typical PPG": 25},
