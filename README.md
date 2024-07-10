@@ -47,6 +47,10 @@ pip install fastapi uvicorn jinja2
 2. **Start the FastAPI application**:
    
    ```bash
+   To start the application first time: 
+   uvicorn main:app
+   
+   To reload the application:
    uvicorn main:app --reload
    ```
 
